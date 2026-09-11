@@ -1,0 +1,13 @@
+{
+  "name": "inf1103-lab-2",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspace",
+
+  "runArgs": [
+    "--name",
+    "inf1103-lab-2"
+  ]
+}
