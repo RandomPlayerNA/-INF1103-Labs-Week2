@@ -4,16 +4,15 @@
 
 # Funtion to get Product Name or 'quit' from User
 def get_product_name():
-    product_name = input("\nEnter Product Name: ").strip()
+    product_name = input("Enter Product Name: ").strip()
+    
+    while not product_name:
+        print("Product name cannot be empty. Please try again.")
+        product_name = input("Enter Product Name: ").strip()
     
     # Check if User Wants to Quit
     if product_name.lower() == 'quit':
         return 'quit'
-    
-    # Check if Product Name is Empty
-    elif not product_name:
-        print("Product name cannot be empty. Please try again.")
-        return get_product_name()
     
     return product_name
 
@@ -24,11 +23,11 @@ def get_valid_stock_input():
     stock = input("Enter Quantity: ").strip().lower()
     
     # Check if User Input is a Digit (This One will Auto Block Negatives Numbers too)
-    if stock.isdigit():
-        return int(stock)
-    else:
+    while not stock.isdigit():
         print("Invalid input! Please enter a positive integer.")
-        return get_valid_stock_input()
+        stock = input("Enter Quantity: ").strip().lower()
+    
+    return int(stock)
 
 # Function to Print out Order in 'inventory.txt' File & Return Total Order Count
 def load_inventory():
@@ -40,9 +39,9 @@ def load_inventory():
         
         # Check if File is Empty and Print Contents or Message
         if length == 0:
-            print("No orders found.")
+            print("No orders found." + "\n")
         else:
-            print(contents)
+            print(contents + "\n")
         
     return length
 
@@ -80,7 +79,7 @@ while True:
     ID += 1  # Increment Product ID for Each New Order
     
     # Print New Order Added
-    print(f"\nNew Order Added: {ID},{product_name},{stock}\n")
+    print(f"\nNew Order Added:\n{ID},{product_name},{stock}\n")
     
     # Append Product to Inventory List
     INV.append((ID, product_name, stock))
