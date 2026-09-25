@@ -10,6 +10,11 @@ def get_product_name():
     if product_name.lower() == 'quit':
         return 'quit'
     
+    # Check if Product Name is Empty
+    elif not product_name:
+        print("Product name cannot be empty. Please try again.")
+        return get_product_name()
+    
     return product_name
 
 # Function to Get Valid Input from User
@@ -21,8 +26,9 @@ def get_valid_stock_input():
     # Check if User Input is a Digit (This One will Auto Block Negatives Numbers too)
     if stock.isdigit():
         return int(stock)
- 
-    return None
+    else:
+        print("Invalid input! Please enter a positive integer.")
+        return get_valid_stock_input()
 
 # Function to Print out Order in 'inventory.txt' File & Return Total Order Count
 def load_inventory():
@@ -41,9 +47,9 @@ def load_inventory():
     return length
 
 # Function to Save Inventory to 'inventory.txt' File
-def save_inventory():
+def save_inventory(inventory):
     with open('inventory.txt', 'a') as file:
-        for item in INV:
+        for item in inventory:
             file.write(f"{item[0]},{item[1]},{item[2]}\n")
             
 # -----------------#
@@ -71,11 +77,6 @@ while True:
     # Get Valid Input from User
     stock = get_valid_stock_input()
     
-    # Handle Invalid Input
-    if stock is None:
-        print("Invalid input! Please enter a positive integer.\n\n")
-        continue
-    
     ID += 1  # Increment Product ID for Each New Order
     
     # Print New Order Added
@@ -85,5 +86,5 @@ while True:
     INV.append((ID, product_name, stock))
     
 # Save Inventory to 'inventory.txt' File
-save_inventory()
+save_inventory(INV)
 print("\nOrder successfully saved to inventory.txt")
