@@ -97,14 +97,14 @@ def add_product(inventory):
 
 # Function to Update the Stock of an Existing Product
 def update_stock(inventory):
-    print("Update Stock")
+    print("\nUpdate Stock")
     product = find_product(inventory, get_text_input("Enter Product ID: ").upper())
 
     if product is None:
-        print("Product not found.")
+        print("\nProduct not found.")
         return
 
-    print("Product Found:")
+    print("\nProduct Found:")
     print(f"Name: {product['name']}")
     print(f"Current Stock: {product['stock']}")
     product["stock"] = get_valid_stock_input("\nNew Stock Quantity: ")
@@ -113,14 +113,14 @@ def update_stock(inventory):
 
 # Function to Search for a Product by ID
 def search_product(inventory):
-    print("Search Product")
+    print("\nSearch Product")
     product = find_product(inventory, get_text_input("Enter Product ID: ").upper())
 
     if product is None:
-        print("Product not found.")
+        print("\nProduct not found.")
         return
 
-    print("Product Found")
+    print("\nProduct Found")
     print("------------------")
     print(f"ID: {product['id']}")
     print(f"Name: {product['name']}")
@@ -197,11 +197,11 @@ while True:
     elif option == "4":
         search_product(inventory)
     elif option == "5":
-        print("Saving inventory...")
+        print("\nSaving inventory...")
         save_inventory(inventory)
         print(f"Inventory saved successfully to {FILENAME}.")
     elif option == "6":
-        print("Saving inventory before exit...")
+        print("\nSaving inventory before exit...")
         save_inventory(inventory)
         print("Inventory saved successfully.")
         print("Thank you for using Inventory Management System.")
