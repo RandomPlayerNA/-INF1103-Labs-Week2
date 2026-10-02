@@ -6,6 +6,6 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY persistent_auditor.py .
+COPY inventory_manager.py .
 
-CMD ["python", "persistent_auditor.py"]
+CMD ["python", "inventory_manager.py"]

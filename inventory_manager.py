@@ -1,89 +1,213 @@
-#-----------#
-# FUNCTIONS
-#-----------#
+# --------#
+# Imports
+# --------#
 
-# Funtion to get Product Name or 'quit' from User
-def get_product_name():
-    product_name = input("Enter Product Name: ").strip()
-    
-    while not product_name:
-        print("Product name cannot be empty. Please try again.")
-        product_name = input("Enter Product Name: ").strip()
-    
-    # Check if User Wants to Quit
-    if product_name.lower() == 'quit':
-        return 'quit'
-    
-    return product_name
+import json
+import os
 
-# Function to Get Valid Input from User
-def get_valid_stock_input():
-    
-    # Ask User for Stock Quantity
-    stock = input("Enter Quantity: ").strip().lower()
-    
-    # Check if User Input is a Digit (This One will Auto Block Negatives Numbers too)
+# ----------#
+# Variables
+# ----------#
+
+FILENAME = "inventory.json"
+
+# ----------------#
+# Input Functions
+# ----------------#
+
+# Function to Get Non-Empty Text from User
+def get_text_input(prompt):
+    text = input(prompt).strip()
+
+    while not text:
+        print("Input cannot be empty. Please try again.")
+        text = input(prompt).strip()
+
+    return text
+
+
+# Function to Get Valid Stock Quantity from User
+def get_valid_stock_input(prompt):
+    stock = input(prompt).strip()
+
+    # isdigit() Blocks Negatives, Decimals and Text
     while not stock.isdigit():
-        print("Invalid input! Please enter a positive integer.")
-        stock = input("Enter Quantity: ").strip().lower()
-    
+        print("Invalid input! Please enter a non-negative integer.")
+        stock = input(prompt).strip()
+
     return int(stock)
 
-# Function to Print out Order in 'inventory.txt' File & Return Total Order Count
+
+# Function to Get Valid Price from User
+def get_valid_price_input(prompt):
+    while True:
+        try:
+            price = float(input(prompt).strip())
+            if price >= 0:
+                return price
+        except ValueError:
+            pass
+        print("Invalid input! Please enter a non-negative number.")
+
+
+# --------------------#
+# Inventory Functions
+# --------------------#
+
+# Function to Find a Product Dictionary by ID (Returns None if Not Found)
+def find_product(inventory, product_id):
+    for product in inventory:
+        if product["id"] == product_id:
+            return product
+    return None
+
+
+# Function to Display All Products
+def display_all(inventory):
+    print("\nCurrent Inventory")
+    print("------------------")
+
+    if not inventory:
+        print("No products in inventory.")
+
+    for product in inventory:
+        print(f"ID: {product['id']} | Name: {product['name']} | "
+              f"Price: ${product['price']:.2f} | Stock: {product['stock']}")
+
+    print("------------------")
+
+
+# Function to Add a New Product
+def add_product(inventory):
+    print("\nAdd New Product")
+    product_id = get_text_input("Product ID: ").upper()
+
+    # Product IDs Must Be Unique
+    if find_product(inventory, product_id):
+        print("Product ID already exists. Use Update Stock instead.")
+        return
+
+    name = get_text_input("Product Name: ")
+    price = get_valid_price_input("Price: ")
+    stock = get_valid_stock_input("Stock Quantity: ")
+
+    inventory.append({"id": product_id, "name": name, "price": price, "stock": stock})
+    print("\nProduct added successfully!")
+
+
+# Function to Update the Stock of an Existing Product
+def update_stock(inventory):
+    print("Update Stock")
+    product = find_product(inventory, get_text_input("Enter Product ID: ").upper())
+
+    if product is None:
+        print("Product not found.")
+        return
+
+    print("Product Found:")
+    print(f"Name: {product['name']}")
+    print(f"Current Stock: {product['stock']}")
+    product["stock"] = get_valid_stock_input("\nNew Stock Quantity: ")
+    print("\nStock updated successfully!")
+
+
+# Function to Search for a Product by ID
+def search_product(inventory):
+    print("Search Product")
+    product = find_product(inventory, get_text_input("Enter Product ID: ").upper())
+
+    if product is None:
+        print("Product not found.")
+        return
+
+    print("Product Found")
+    print("------------------")
+    print(f"ID: {product['id']}")
+    print(f"Name: {product['name']}")
+    print(f"Price: ${product['price']:.2f}")
+    print(f"Stock: {product['stock']}")
+    print("------------------")
+
+
+# ----------------------#
+# Persistence Functions
+# ----------------------#
+
+# Function to Load Inventory from 'inventory.json' (Empty List if Missing)
 def load_inventory():
-    print("Current Orders:")
-    with open('inventory.txt', 'a+') as file:
-        file.seek(0)  # Move the cursor to the beginning of the file
-        contents = file.read()
-        length = len(contents.splitlines())
-        
-        # Check if File is Empty and Print Contents or Message
-        if length == 0:
-            print("No orders found." + "\n")
-        else:
-            print(contents + "\n")
-        
-    return length
+    if not os.path.exists(FILENAME):
+        print(f"\n{FILENAME} not found.")
+        print("Starting with an empty inventory.")
+        return []
 
-# Function to Save Inventory to 'inventory.txt' File
+    print(f"\n{FILENAME} found.")
+    try:
+        with open(FILENAME, "r") as file:
+            inventory = json.load(file)
+    except json.JSONDecodeError:
+        print("\File is empty or corrupted. Starting with an empty inventory.")
+        return []
+
+    print("Inventory loaded successfully.\n")
+    return inventory
+
+
+# Function to Save Inventory to 'inventory.json'
 def save_inventory(inventory):
-    with open('inventory.txt', 'a') as file:
-        for item in inventory:
-            file.write(f"{item[0]},{item[1]},{item[2]}\n")
-            
-# -----------------#
-# GLOBAL VARIABLES
-# -----------------#
+    with open(FILENAME, "w") as file:
+        json.dump(inventory, file, indent=4)
 
-INV = [] #Initialize Inventory List
-LEN_ORDER = load_inventory() # Get Current Order
-ID = 1000 + LEN_ORDER # Get Current Product ID
 
-#------#
+# ------#
+# Menu
+# ------#
+
+def display_menu():
+    print("----------- MENU -----------")
+    print("1. Display All Products")
+    print("2. Add Product")
+    print("3. Update Stock")
+    print("4. Search Product")
+    print("5. Save Inventory")
+    print("6. Exit")
+    print("----------------------------")
+
+
+# ------#
 # Main
-#------#
+# ------#
 
-# Continue Running Until User is Done or Wants to Quit
+print("================================")
+print("INVENTORY MANAGEMENT SYSTEM")
+print("================================")
+
+inventory = load_inventory()  # List of Product Dictionaries
+display_menu()
+
+# Continue Running Until User Chooses Exit
 while True:
-    
-    # Get Product Name from User
-    product_name = get_product_name()
-    
-    # Check if User Wants to Quit
-    if product_name == 'quit':
+    option = input("\nEnter option: ").strip()
+
+    if option == "1":
+        display_all(inventory)
+    elif option == "2":
+        add_product(inventory)
+    elif option == "3":
+        update_stock(inventory)
+    elif option == "4":
+        search_product(inventory)
+    elif option == "5":
+        print("Saving inventory...")
+        save_inventory(inventory)
+        print(f"Inventory saved successfully to {FILENAME}.")
+    elif option == "6":
+        print("Saving inventory before exit...")
+        save_inventory(inventory)
+        print("Inventory saved successfully.")
+        print("Thank you for using Inventory Management System.")
+        print("Program terminated.")
         break
-    
-    # Get Valid Input from User
-    stock = get_valid_stock_input()
-    
-    ID += 1  # Increment Product ID for Each New Order
-    
-    # Print New Order Added
-    print(f"\nNew Order Added:\n{ID},{product_name},{stock}\n")
-    
-    # Append Product to Inventory List
-    INV.append((ID, product_name, stock))
-    
-# Save Inventory to 'inventory.txt' File
-save_inventory(INV)
-print("\nOrder successfully saved to inventory.txt")
+    else:
+        print("Invalid option. Please enter a number from 1 to 6.")
+        display_menu()
+            
