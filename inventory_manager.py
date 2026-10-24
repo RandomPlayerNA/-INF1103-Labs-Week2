@@ -88,7 +88,6 @@ def get_text_input(prompt):
 
     return text
 
-
 # Function to Get Valid Stock Quantity from User
 def get_valid_stock_input(prompt):
     stock = input(prompt).strip()
@@ -100,7 +99,6 @@ def get_valid_stock_input(prompt):
 
     return int(stock)
 
-
 # Function to Get Valid Price from User
 def get_valid_price_input(prompt):
     while True:
@@ -111,7 +109,6 @@ def get_valid_price_input(prompt):
         except ValueError:
             pass
         print("Invalid input! Please enter a non-negative number.")
-
 
 # ------------------- #
 # Inventory Functions
@@ -222,7 +219,7 @@ print("================================")
 print("INVENTORY MANAGEMENT SYSTEM")
 print("================================")
 
-inventory = load_inventory()  # Inventory Object Holding Product Objects
+inventory = load_inventory()
 display_menu()
 
 # Continue Running Until User Chooses Exit
