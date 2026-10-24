@@ -26,18 +26,22 @@ class Product:
     def get_id(self):
         return self.__id
 
+    def get_name(self):
+        return self.__name
+
+    def get_stock(self):
+        return self.__stock
+
     def update_stock(self, quantity):
         if not isinstance(quantity, int) or quantity < 0:
             raise ValueError("Stock must be a non-negative integer.")
         self.__stock = quantity
 
     def display_information(self):
-        print("------------------")
         print(f"ID: {self.__id}")
         print(f"Name: {self.__name}")
         print(f"Price: ${self.__price:.2f}")
         print(f"Stock: {self.__stock}")
-        print("------------------")
     
     def to_dict(self):
         return {
@@ -69,7 +73,7 @@ class Inventory:
         print("------------------")
         for product in self.__products:
             product.display_information()
-        print("------------------")
+            print("------------------")
     
     def to_list(self):
         return [product.to_dict() for product in self.__products]
@@ -114,7 +118,6 @@ def get_valid_price_input(prompt):
 # Inventory Functions
 # ------------------- #
 
-
 # Function to Add a New Product
 def add_product(inventory):
     print("\nAdd New Product")
@@ -132,7 +135,6 @@ def add_product(inventory):
     inventory.add_product(Product(product_id, name, price, stock))
     print("\nProduct added successfully!")
 
-
 # Function to Update the Stock of an Existing Product
 def update_stock(inventory):
     print("\nUpdate Stock")
@@ -143,10 +145,10 @@ def update_stock(inventory):
         return
 
     print("\nProduct Found:")
-    product.display_information()
+    print(f"Name: {product.get_name()}")
+    print(f"Current Stock: {product.get_stock()}")
     product.update_stock(get_valid_stock_input("\nNew Stock Quantity: "))
     print("\nStock updated successfully!")
-
 
 # Function to Search for a Product by ID
 def search_product(inventory):
@@ -158,8 +160,9 @@ def search_product(inventory):
         return
 
     print("\nProduct Found")
+    print("------------------")
     product.display_information()
-
+    print("------------------")
 
 # --------------------- #
 # Persistence Functions
@@ -179,7 +182,7 @@ def load_inventory():
         with open(FILENAME, "r") as file:
             data = json.load(file)
     except json.JSONDecodeError:
-        print("\File is empty or corrupted. Starting with an empty inventory.")
+        print("\nFile is empty or corrupted. Starting with an empty inventory.")
         return inventory
 
     # Convert Each Product Dictionary into a Product Object
@@ -189,12 +192,10 @@ def load_inventory():
     print("Inventory loaded successfully.\n")
     return inventory
 
-
 # Function to Save Inventory to 'inventory.json'
 def save_inventory(inventory):
     with open(FILENAME, "w") as file:
         json.dump(inventory.to_list(), file, indent=4)
-
 
 # ---- #
 # Menu
@@ -209,7 +210,6 @@ def display_menu():
     print("5. Save Inventory")
     print("6. Exit")
     print("----------------------------")
-
 
 # ---- #
 # Main
@@ -248,4 +248,3 @@ while True:
     else:
         print("Invalid option. Please enter a number from 1 to 6.")
         display_menu()
-            
