@@ -4,6 +4,7 @@
 
 import json
 import os
+from abc import ABC, abstractmethod
 
 # --------- #
 # Variables
@@ -16,13 +17,17 @@ FILENAME = "inventory.json"
 # ------- #
 
 # Product Class
-class Product:
+class Product(ABC):
     def __init__(self, productid, name, price, stock):
         self.__id = productid
         self.__name = name
         self.__price = price
         self.__stock = stock
-        
+
+    @abstractmethod
+    def display_information(self):
+        pass
+
     def get_id(self):
         return self.__id
 
@@ -37,6 +42,7 @@ class Product:
             raise ValueError("Stock must be a non-negative integer.")
         self.__stock = quantity
 
+    @abstractmethod
     def display_information(self):
         print(f"ID: {self.__id}")
         print(f"Name: {self.__name}")
@@ -51,7 +57,7 @@ class Product:
             "stock": self.__stock
         }
 
-# Product Sub-Class with New 
+# Product Sub-Class with New Attribute, Weight
 class PhysicalProduct(Product):
     def __init__(self, productid, name, price, stock, weight):
         super().__init__(productid, name, price, stock)
@@ -67,6 +73,24 @@ class PhysicalProduct(Product):
     def to_dict(self):
         data = super().to_dict()
         data["weight"] = self.__weight
+        return data
+
+# Product Sub-Class with New Attribute, Download Size
+class DigitalProduct(Product):
+    def __init__(self, productid, name, price, stock, download_size):
+        super().__init__(productid, name, price, stock)
+        self.__download_size = download_size
+
+    def get_download_size(self):
+        return self.__download_size
+
+    def display_information(self):
+        super().display_information()
+        print(f"Download Size: {self.__download_size} MB")
+
+    def to_dict(self):
+        data = super().to_dict()
+        data["download_size"] = self.__download_size
         return data
 
 # Inventory Class
