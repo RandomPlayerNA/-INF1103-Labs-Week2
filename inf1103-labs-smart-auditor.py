@@ -16,17 +16,19 @@ FILENAME = "inventory.json"
 # Classes
 # ------- #
 
-# Product Class
+# Abstract Base Class for Products that Can Be Shipped
+class CanBeShipped(ABC):
+    @abstractmethod
+    def calculate_shipping_cost(self):
+        pass
+
+# Abstract Product Class
 class Product(ABC):
     def __init__(self, productid, name, price, stock):
         self.__id = productid
         self.__name = name
         self.__price = price
         self.__stock = stock
-
-    @abstractmethod
-    def display_information(self):
-        pass
 
     def get_id(self):
         return self.__id
@@ -42,7 +44,6 @@ class Product(ABC):
             raise ValueError("Stock must be a non-negative integer.")
         self.__stock = quantity
 
-    @abstractmethod
     def display_information(self):
         print(f"ID: {self.__id}")
         print(f"Name: {self.__name}")
@@ -58,13 +59,13 @@ class Product(ABC):
         }
 
 # Product Sub-Class with New Attribute, Weight
-class PhysicalProduct(Product):
+class PhysicalProduct(Product, CanBeShipped):
     def __init__(self, productid, name, price, stock, weight):
         super().__init__(productid, name, price, stock)
         self.__weight = weight
 
-    def get_weight(self):
-        return self.__weight
+    def calculate_shipping_cost(self):
+        return self.__weight * 10  # $10 per kg
 
     def display_information(self):
         super().display_information()
