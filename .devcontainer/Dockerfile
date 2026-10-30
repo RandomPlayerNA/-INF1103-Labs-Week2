@@ -6,6 +6,6 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY inventory_manager.py .
+COPY inf1103-labs-smart-auditor.py .
 
-CMD ["python", "inventory_manager.py"]
+CMD ["python", "inf1103-labs-smart-auditor.py"]

@@ -51,6 +51,24 @@ class Product:
             "stock": self.__stock
         }
 
+# Product Sub-Class with New 
+class PhysicalProduct(Product):
+    def __init__(self, productid, name, price, stock, weight):
+        super().__init__(productid, name, price, stock)
+        self.__weight = weight
+
+    def get_weight(self):
+        return self.__weight
+
+    def display_information(self):
+        super().display_information()
+        print(f"Weight: {self.__weight} kg")
+
+    def to_dict(self):
+        data = super().to_dict()
+        data["weight"] = self.__weight
+        return data
+
 # Inventory Class
 class Inventory:
     def __init__(self):
