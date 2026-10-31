@@ -6,6 +6,6 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY inf1103-labs-smart-auditor.py .
+COPY main.py .
 
-CMD ["python", "inf1103-labs-smart-auditor.py"]
+CMD ["python", "main.py"]

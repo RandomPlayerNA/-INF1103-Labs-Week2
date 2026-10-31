@@ -38,6 +38,10 @@ class Product(ABC):
 
     def get_stock(self):
         return self.__stock
+    
+    @abstractmethod
+    def get_fulfillment_info(self):
+        pass
 
     def update_stock(self, quantity):
         if not isinstance(quantity, int) or quantity < 0:
@@ -49,7 +53,8 @@ class Product(ABC):
         print(f"Name: {self.__name}")
         print(f"Price: ${self.__price:.2f}")
         print(f"Stock: {self.__stock}")
-    
+        print(f"Fulfillment: {self.get_fulfillment_info()}")
+
     def to_dict(self):
         return {
             "id": self.__id,
@@ -70,11 +75,16 @@ class PhysicalProduct(Product, CanBeShipped):
     def display_information(self):
         super().display_information()
         print(f"Weight: {self.__weight} kg")
+        print(f"Shipping Cost: ${self.calculate_shipping_cost():.2f}")
 
     def to_dict(self):
         data = super().to_dict()
+        data["type"] = "physical"
         data["weight"] = self.__weight
         return data
+    
+    def get_fulfillment_info(self):
+        return "Product requires physical shipping."
 
 # Product Sub-Class with New Attribute, Download Size
 class DigitalProduct(Product):
@@ -82,17 +92,18 @@ class DigitalProduct(Product):
         super().__init__(productid, name, price, stock)
         self.__download_size = download_size
 
-    def get_download_size(self):
-        return self.__download_size
-
     def display_information(self):
         super().display_information()
         print(f"Download Size: {self.__download_size} MB")
 
     def to_dict(self):
         data = super().to_dict()
+        data["type"] = "digital"
         data["download_size"] = self.__download_size
         return data
+    
+    def get_fulfillment_info(self):
+        return "Product is delivered digitally."
 
 # Inventory Class
 class Inventory:
@@ -171,11 +182,23 @@ def add_product(inventory):
         print("Product ID already exists. Use Update Stock instead.")
         return
 
+    product_type = get_text_input("Product Type (P = Physical, D = Digital): ").upper()
+
+    while product_type not in ("P", "D"):
+        print("Invalid input! Please enter P or D.")
+        product_type = get_text_input("Product Type (P = Physical, D = Digital): ").upper()
+
     name = get_text_input("Product Name: ")
     price = get_valid_price_input("Price: ")
     stock = get_valid_stock_input("Stock Quantity: ")
 
-    inventory.add_product(Product(product_id, name, price, stock))
+    # Ask for the Attribute Specific to the Chosen Product Type
+    if product_type == "P":
+        weight = get_valid_price_input("Weight (kg): ")
+        inventory.add_product(PhysicalProduct(product_id, name, price, stock, weight))
+    else:
+        download_size = get_valid_price_input("Download Size (MB): ")
+        inventory.add_product(DigitalProduct(product_id, name, price, stock, download_size))
     print("\nProduct added successfully!")
 
 # Function to Update the Stock of an Existing Product
@@ -228,9 +251,14 @@ def load_inventory():
         print("\nFile is empty or corrupted. Starting with an empty inventory.")
         return inventory
 
-    # Convert Each Product Dictionary into a Product Object
+    # Convert Each Product Dictionary into the Matching Product Sub-Class Using Its Type
     for item in data:
-        inventory.add_product(Product(item["id"], item["name"], item["price"], item["stock"]))
+        if item["type"] == "physical":
+            inventory.add_product(PhysicalProduct(item["id"], item["name"], item["price"],
+                                                  item["stock"], item["weight"]))
+        elif item["type"] == "digital":
+            inventory.add_product(DigitalProduct(item["id"], item["name"], item["price"],
+                                                 item["stock"], item["download_size"]))
 
     print("Inventory loaded successfully.\n")
     return inventory
