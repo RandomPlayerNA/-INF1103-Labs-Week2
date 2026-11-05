@@ -56,6 +56,9 @@ class Product(ABC):
     def get_name(self) -> str:
         return self.__name
 
+    def get_price(self) -> float:
+        return self.__price
+
     def get_stock(self) -> int:
         return self.__stock
 
@@ -162,6 +165,55 @@ class Inventory:
     
     def to_list(self) -> list[dict]:
         return [product.to_dict() for product in self.__products]
+
+# OrderLine Class (Refers to a Product, Does Not Own It)
+class OrderLine:
+    def __init__(self, product: Product, quantity: int):
+        self.__product: Product = product
+        self.__quantity: int = quantity
+
+    def get_product(self) -> Product:
+        return self.__product
+
+    def calculate_subtotal(self) -> float:
+        return self.__product.get_price() * self.__quantity
+
+    def display_information(self) -> None:
+        print(f"{self.__product.get_name()} x {self.__quantity} = ${self.calculate_subtotal():.2f}")
+
+# Order Class (Creates and Owns Its OrderLines)
+class Order:
+    def __init__(self, order_id: str):
+        self.__order_id: str = order_id
+        self.__order_lines: list[OrderLine] = []
+
+    # OrderLine Is Created Inside the Order, Never Passed In
+    def add_order_line(self, product: Product, quantity: int) -> None:
+        order_line = OrderLine(product, quantity)
+        self.__order_lines.append(order_line)
+
+    def remove_order_line(self, productid: str) -> bool:
+        for line in self.__order_lines:
+            if line.get_product().get_id() == productid:
+                self.__order_lines.remove(line)
+                return True
+        return False
+
+    # Each OrderLine Calculates Its Own Subtotal
+    def calculate_total(self) -> float:
+        total = 0.0
+        for line in self.__order_lines:
+            total += line.calculate_subtotal()
+        return total
+
+    def display_order(self) -> None:
+        print(f"Order ID: {self.__order_id}")
+        if not self.__order_lines:
+            print("No order lines.")
+            return
+        for line in self.__order_lines:
+            line.display_information()
+        print(f"Total: ${self.calculate_total():.2f}")
 
 # --------------- #
 # Input Functions
@@ -280,6 +332,58 @@ def remove_product(inventory: Inventory) -> None:
     else:
         print("\nProduct not found.")
 
+# --------------- #
+# Order Functions
+# --------------- #
+
+# Function to Create a New Order from Inventory Products
+def create_order(inventory: Inventory, orders: list[Order]) -> None:
+    print("\nCreate Order")
+    order = Order(get_text_input("Order ID: ").upper())
+    lines_added = 0
+
+    # Keep Adding Products Until User Enters a Blank ID
+    while True:
+        product_id = input("Product ID (Blank to Finish): ").strip().upper()
+        if not product_id:
+            break
+
+        product = inventory.find_product(product_id)
+        if product is None:
+            print("Product not found.")
+            continue
+
+        quantity = get_valid_stock_input("Quantity: ")
+        while quantity == 0:
+            print("Quantity must be at least 1.")
+            quantity = get_valid_stock_input("Quantity: ")
+
+        order.add_order_line(product, quantity)
+        lines_added += 1
+        print(f"{product.get_name()} added to order.")
+
+    # Empty Orders Are Not Kept
+    if lines_added == 0:
+        print("\nNo products added. Order cancelled.")
+        return
+
+    orders.append(order)
+    print("\nOrder created successfully!")
+    print("------------------")
+    order.display_order()
+    print("------------------")
+
+# Function to Display All Orders Created This Session
+def view_orders(orders: list[Order]) -> None:
+    if not orders:
+        print("\nNo orders created yet.")
+        return
+    print("\nAll Orders")
+    print("------------------")
+    for order in orders:
+        order.display_order()
+        print("------------------")
+
 # --------------------- #
 # Persistence Functions
 # --------------------- #
@@ -337,8 +441,10 @@ def display_menu() -> None:
     print("3. Update Stock")
     print("4. Search Product")
     print("5. Remove Product")
-    print("6. Save Inventory")
-    print("7. Exit")
+    print("6. Create Order")
+    print("7. View Orders")
+    print("8. Save Inventory")
+    print("9. Exit")
     print("---------------------------")
 
 # ---- #
@@ -350,6 +456,9 @@ print("INVENTORY MANAGEMENT SYSTEM")
 print("================================")
 
 inventory = load_inventory()
+
+# Orders Are Kept in Memory Only (Not Saved)
+orders: list[Order] = []
 display_menu()
 
 # Continue Running Until User Chooses Exit
@@ -367,10 +476,14 @@ while True:
     elif option == "5":
         remove_product(inventory)
     elif option == "6":
+        create_order(inventory, orders)
+    elif option == "7":
+        view_orders(orders)
+    elif option == "8":
         print("\nSaving inventory...")
         save_inventory(inventory)
         print(f"Inventory saved successfully to {FILENAME}.")
-    elif option == "7":
+    elif option == "9":
         print("\nSaving inventory before exit...")
         save_inventory(inventory)
         print("Inventory saved successfully.")
@@ -378,5 +491,5 @@ while True:
         print("Program terminated.")
         break
     else:
-        print("Invalid option. Please enter a number from 1 to 7.")
+        print("Invalid option. Please enter a number from 1 to 9.")
         display_menu()
