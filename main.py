@@ -137,11 +137,18 @@ class Inventory:
     def add_product(self, product: Product) -> None:
         self.__products.append(product)
 
-    def search_product(self, productid: str) -> Product | None:
+    def find_product(self, productid: str) -> Product | None:
         for product in self.__products:
             if product.get_id() == productid:
                 return product
         return None
+
+    def remove_product(self, productid: str) -> bool:
+        product = self.find_product(productid)
+        if product is None:
+            return False
+        self.__products.remove(product)
+        return True
 
     def display_all(self) -> None:
         if not self.__products:
@@ -202,7 +209,7 @@ def add_product(inventory: Inventory) -> None:
     product_id = get_text_input("Product ID: ").upper()
 
     # Product IDs Must Be Unique
-    if inventory.search_product(product_id):
+    if inventory.find_product(product_id):
         print("Product ID already exists. Use Update Stock instead.")
         return
 
@@ -237,7 +244,7 @@ def add_product(inventory: Inventory) -> None:
 # Function to Update the Stock of an Existing Product
 def update_stock(inventory: Inventory) -> None:
     print("\nUpdate Stock")
-    product = inventory.search_product(get_text_input("Enter Product ID: ").upper())
+    product = inventory.find_product(get_text_input("Enter Product ID: ").upper())
 
     if product is None:
         print("\nProduct not found.")
@@ -252,7 +259,7 @@ def update_stock(inventory: Inventory) -> None:
 # Function to Search for a Product by ID
 def search_product(inventory: Inventory) -> None:
     print("\nSearch Product")
-    product = inventory.search_product(get_text_input("Enter Product ID: ").upper())
+    product = inventory.find_product(get_text_input("Enter Product ID: ").upper())
 
     if product is None:
         print("\nProduct not found.")
@@ -262,6 +269,16 @@ def search_product(inventory: Inventory) -> None:
     print("------------------")
     product.display_information()
     print("------------------")
+
+# Function to Remove a Product by ID
+def remove_product(inventory: Inventory) -> None:
+    print("\nRemove Product")
+    product_id = get_text_input("Enter Product ID: ").upper()
+
+    if inventory.remove_product(product_id):
+        print("\nProduct removed successfully!")
+    else:
+        print("\nProduct not found.")
 
 # --------------------- #
 # Persistence Functions
@@ -319,8 +336,9 @@ def display_menu() -> None:
     print("2. Add Product")
     print("3. Update Stock")
     print("4. Search Product")
-    print("5. Save Inventory")
-    print("6. Exit")
+    print("5. Remove Product")
+    print("6. Save Inventory")
+    print("7. Exit")
     print("---------------------------")
 
 # ---- #
@@ -347,10 +365,12 @@ while True:
     elif option == "4":
         search_product(inventory)
     elif option == "5":
+        remove_product(inventory)
+    elif option == "6":
         print("\nSaving inventory...")
         save_inventory(inventory)
         print(f"Inventory saved successfully to {FILENAME}.")
-    elif option == "6":
+    elif option == "7":
         print("\nSaving inventory before exit...")
         save_inventory(inventory)
         print("Inventory saved successfully.")
@@ -358,5 +378,5 @@ while True:
         print("Program terminated.")
         break
     else:
-        print("Invalid option. Please enter a number from 1 to 6.")
+        print("Invalid option. Please enter a number from 1 to 7.")
         display_menu()
