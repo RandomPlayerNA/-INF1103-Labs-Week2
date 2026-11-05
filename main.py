@@ -406,7 +406,7 @@ def load_inventory() -> Inventory:
         return inventory
 
     # Suppliers Already Created, Stored by Supplier ID
-    suppliers = {}
+    suppliers: dict[str, Supplier] = {}
 
     # Convert Each Product Dictionary into the Matching Product Sub-Class Using Its Type
     for item in data:
