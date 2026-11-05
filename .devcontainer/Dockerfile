@@ -6,6 +6,6 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY main.py .
+COPY main.py test_lab8.py inventory.json ./
 
 CMD ["python", "main.py"]
