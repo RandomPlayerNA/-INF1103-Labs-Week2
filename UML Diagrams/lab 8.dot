@@ -1,0 +1,114 @@
+// Inventory Management System - UML Class Diagram (Lab 8)
+// Render: dot -Tpng -Gdpi=150 "lab 8.dot" -o "lab 8.png"
+
+digraph UML {
+    graph [label="Inventory Management System - UML Class Diagram (Lab 8)", labelloc=t,
+           fontname="DejaVu Sans", fontsize=18, nodesep=0.8, ranksep=1.0, pad=0.4, bgcolor="white"]
+    node  [shape=plaintext, fontname="DejaVu Sans", fontsize=11]
+    edge  [fontname="DejaVu Sans", fontsize=10, labelfontname="DejaVu Sans", labelfontsize=11,
+           labeldistance=2.0, arrowsize=1.2]
+
+    // ------- //
+    // Classes
+    // ------- //
+
+    Supplier [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+      <TR><TD BGCOLOR="#e3edf9"><B>Supplier</B></TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">- supplier_id: String<BR/>- name: String<BR/>- contact_email: String</TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ display_information(): void<BR/>+ to_dict(): Dictionary</TD></TR>
+    </TABLE>>]
+
+    Inventory [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+      <TR><TD BGCOLOR="#e3edf9"><B>Inventory</B></TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">- products: Product [0..*]</TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ add_product(product: Product): void<BR/>+ find_product(product_id: String): Product [0..1]<BR/>+ get_products(): Product [0..*]<BR/>+ remove_product(product_id: String): Boolean<BR/>+ display_all_products(): void<BR/>+ to_list(): Dictionary [0..*]</TD></TR>
+    </TABLE>>]
+
+    Order [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+      <TR><TD BGCOLOR="#e3edf9"><B>Order</B></TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">- order_id: String<BR/>- order_lines: OrderLine [0..*]</TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ add_order_line(product: Product, quantity: Integer): void<BR/>+ get_order_lines(): OrderLine [0..*]<BR/>+ remove_order_line(product_id: String): Boolean<BR/>+ calculate_total(): Float<BR/>+ display_order(): void</TD></TR>
+    </TABLE>>]
+
+    CanBeShipped [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+      <TR><TD BGCOLOR="#f3e8d2">&laquo;interface&raquo;<BR/><B>CanBeShipped</B></TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT"> </TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT"><I>+ calculate_shipping_cost(): Float</I></TD></TR>
+    </TABLE>>]
+
+    Product [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+      <TR><TD BGCOLOR="#f3e8d2">&laquo;abstract&raquo;<BR/><B><I>Product</I></B></TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">- id: String<BR/>- name: String<BR/>- price: Float<BR/>- stock: Integer<BR/>- supplier: Supplier</TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ get_id(): String<BR/>+ get_name(): String<BR/>+ get_supplier(): Supplier<BR/>+ get_price(): Float<BR/>+ get_stock(): Integer<BR/><I>+ get_fulfillment_info(): String</I><BR/>+ update_stock(quantity: Integer): void<BR/>+ display_information(): void<BR/>+ to_dict(): Dictionary</TD></TR>
+    </TABLE>>]
+
+    OrderLine [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+      <TR><TD BGCOLOR="#e3edf9"><B>OrderLine</B></TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">- product: Product<BR/>- quantity: Integer</TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ get_product(): Product<BR/>+ calculate_subtotal(): Float<BR/>+ display_information(): void</TD></TR>
+    </TABLE>>]
+
+    PhysicalProduct [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+      <TR><TD BGCOLOR="#e3edf9"><B>PhysicalProduct</B></TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">- weight: Float</TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ calculate_shipping_cost(): Float<BR/>+ get_fulfillment_info(): String<BR/>+ display_information(): void<BR/>+ to_dict(): Dictionary</TD></TR>
+    </TABLE>>]
+
+    DigitalProduct [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="6">
+      <TR><TD BGCOLOR="#e3edf9"><B>DigitalProduct</B></TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">- download_size: Float</TD></TR>
+      <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ get_fulfillment_info(): String<BR/>+ display_information(): void<BR/>+ to_dict(): Dictionary</TD></TR>
+    </TABLE>>]
+
+    Legend [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5">
+      <TR><TD COLSPAN="2" BGCOLOR="#eeeeee"><B>Key</B></TD></TR>
+      <TR><TD ALIGN="LEFT">- / +</TD><TD ALIGN="LEFT">private / public</TD></TR>
+      <TR><TD ALIGN="LEFT"><I>Italic</I></TD><TD ALIGN="LEFT">abstract</TD></TR>
+      <TR><TD ALIGN="LEFT">Type [0..*]</TD><TD ALIGN="LEFT">collection (Python list[Type])</TD></TR>
+      <TR><TD ALIGN="LEFT">Type [0..1]</TD><TD ALIGN="LEFT">optional (Python Type | None)</TD></TR>
+      <TR><TD ALIGN="LEFT">void</TD><TD ALIGN="LEFT">no return value (Python None)</TD></TR>
+    </TABLE>>]
+
+    // ------ //
+    // Layout
+    // ------ //
+
+    { rank=same; Supplier; Inventory; Order }
+    { rank=same; CanBeShipped; Product; OrderLine }
+    { rank=same; PhysicalProduct; DigitalProduct; Legend }
+    Supplier -> Inventory -> Order [style=invis]
+    CanBeShipped -> Product [style=invis]
+    PhysicalProduct -> DigitalProduct -> Legend [style=invis]
+
+    // ------------- //
+    // Relationships
+    // ------------- //
+
+    // Association: Supplier 1 --- 0..* Product (arrow: Product knows its Supplier)
+    Supplier -> Product [dir=back, arrowtail=vee, label="  supplies", taillabel="1", headlabel="0..*", labelangle=40, labeldistance=2.5]
+
+    // Aggregation: hollow diamond at Inventory (the whole)
+    Inventory -> Product [dir=back, arrowtail=odiamond, label="  contains", taillabel="0..1", headlabel="0..*", labelangle=-45, labeldistance=2.5]
+
+    // Composition: filled diamond at Order (the whole)
+    Order -> OrderLine [dir=back, arrowtail=diamond, label="  owns", taillabel="1", headlabel="0..*"]
+
+    // Association: OrderLine 0..* --- 1 Product (arrow: OrderLine knows its Product)
+    Product -> OrderLine [dir=back, arrowtail=vee, label="refers to", taillabel="1", headlabel="0..*"]
+
+    // Inheritance: hollow triangle points to Product (the parent)
+    Product -> PhysicalProduct [dir=back, arrowtail=empty]
+    Product -> DigitalProduct [dir=back, arrowtail=empty]
+
+    // Interface Realisation: dashed line, hollow triangle
+    CanBeShipped -> PhysicalProduct [dir=back, arrowtail=empty, style=dashed]
+}
