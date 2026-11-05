@@ -4,6 +4,11 @@
         "name": "Laptop",
         "price": 1200.0,
         "stock": 15,
+        "supplier": {
+            "id": "S001",
+            "name": "TechWorld Supplies",
+            "email": "sales@techworld.example.com"
+        },
         "type": "physical",
         "weight": 2.0
     },
@@ -12,6 +17,11 @@
         "name": "Mouse",
         "price": 25.5,
         "stock": 40,
+        "supplier": {
+            "id": "S001",
+            "name": "TechWorld Supplies",
+            "email": "sales@techworld.example.com"
+        },
         "type": "physical",
         "weight": 0.1
     },
@@ -20,6 +30,11 @@
         "name": "Keyboard",
         "price": 45.0,
         "stock": 25,
+        "supplier": {
+            "id": "S001",
+            "name": "TechWorld Supplies",
+            "email": "sales@techworld.example.com"
+        },
         "type": "physical",
         "weight": 0.8
     },
@@ -28,6 +43,11 @@
         "name": "Monitor",
         "price": 299.99,
         "stock": 10,
+        "supplier": {
+            "id": "S001",
+            "name": "TechWorld Supplies",
+            "email": "sales@techworld.example.com"
+        },
         "type": "physical",
         "weight": 5.5
     },
@@ -36,6 +56,11 @@
         "name": "Antivirus Software",
         "price": 49.99,
         "stock": 100,
+        "supplier": {
+            "id": "S002",
+            "name": "SecureSoft Ltd",
+            "email": "contact@securesoft.example.com"
+        },
         "type": "digital",
         "download_size": 350.0
     }
