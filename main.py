@@ -56,6 +56,9 @@ class Product(ABC):
     def get_name(self) -> str:
         return self.__name
 
+    def get_supplier(self) -> Supplier:
+        return self.__supplier
+
     def get_price(self) -> float:
         return self.__price
 
@@ -146,6 +149,9 @@ class Inventory:
                 return product
         return None
 
+    def get_products(self) -> list[Product]:
+        return self.__products
+
     def remove_product(self, productid: str) -> bool:
         product = self.find_product(productid)
         if product is None:
@@ -153,7 +159,7 @@ class Inventory:
         self.__products.remove(product)
         return True
 
-    def display_all(self) -> None:
+    def display_all_products(self) -> None:
         if not self.__products:
             print("No products in inventory.")
             return
@@ -191,6 +197,9 @@ class Order:
     def add_order_line(self, product: Product, quantity: int) -> None:
         order_line = OrderLine(product, quantity)
         self.__order_lines.append(order_line)
+
+    def get_order_lines(self) -> list[OrderLine]:
+        return self.__order_lines
 
     def remove_order_line(self, productid: str) -> bool:
         for line in self.__order_lines:
@@ -451,45 +460,47 @@ def display_menu() -> None:
 # Main
 # ---- #
 
-print("================================")
-print("INVENTORY MANAGEMENT SYSTEM")
-print("================================")
+# Menu Only Runs When main.py Is Run Directly, Not When Imported
+if __name__ == "__main__":
+    print("================================")
+    print("INVENTORY MANAGEMENT SYSTEM")
+    print("================================")
 
-inventory = load_inventory()
+    inventory = load_inventory()
 
-# Orders Are Kept in Memory Only (Not Saved)
-orders: list[Order] = []
-display_menu()
+    # Orders Are Kept in Memory Only (Not Saved)
+    orders: list[Order] = []
+    display_menu()
 
-# Continue Running Until User Chooses Exit
-while True:
-    option = input("\nEnter option: ").strip()
+    # Continue Running Until User Chooses Exit
+    while True:
+        option = input("\nEnter option: ").strip()
 
-    if option == "1":
-        inventory.display_all()
-    elif option == "2":
-        add_product(inventory)
-    elif option == "3":
-        update_stock(inventory)
-    elif option == "4":
-        search_product(inventory)
-    elif option == "5":
-        remove_product(inventory)
-    elif option == "6":
-        create_order(inventory, orders)
-    elif option == "7":
-        view_orders(orders)
-    elif option == "8":
-        print("\nSaving inventory...")
-        save_inventory(inventory)
-        print(f"Inventory saved successfully to {FILENAME}.")
-    elif option == "9":
-        print("\nSaving inventory before exit...")
-        save_inventory(inventory)
-        print("Inventory saved successfully.")
-        print("Thank you for using Inventory Management System.")
-        print("Program terminated.")
-        break
-    else:
-        print("Invalid option. Please enter a number from 1 to 9.")
-        display_menu()
+        if option == "1":
+            inventory.display_all_products()
+        elif option == "2":
+            add_product(inventory)
+        elif option == "3":
+            update_stock(inventory)
+        elif option == "4":
+            search_product(inventory)
+        elif option == "5":
+            remove_product(inventory)
+        elif option == "6":
+            create_order(inventory, orders)
+        elif option == "7":
+            view_orders(orders)
+        elif option == "8":
+            print("\nSaving inventory...")
+            save_inventory(inventory)
+            print(f"Inventory saved successfully to {FILENAME}.")
+        elif option == "9":
+            print("\nSaving inventory before exit...")
+            save_inventory(inventory)
+            print("Inventory saved successfully.")
+            print("Thank you for using Inventory Management System.")
+            print("Program terminated.")
+            break
+        else:
+            print("Invalid option. Please enter a number from 1 to 9.")
+            display_menu()
