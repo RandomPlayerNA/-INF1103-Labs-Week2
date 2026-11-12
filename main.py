@@ -172,6 +172,36 @@ class Inventory:
     def to_list(self) -> list[dict]:
         return [product.to_dict() for product in self.__products]
 
+# Abstract Discount Strategy Class
+class DiscountStrategy(ABC):
+    @abstractmethod
+    def apply(self, total: float) -> float:
+        pass
+
+# Discount Strategy that Leaves the Total Unchanged
+class NoDiscount(DiscountStrategy):
+    def apply(self, total: float) -> float:
+        return total
+
+# Discount Strategy that Takes a Percentage Off
+class PercentageDiscount(DiscountStrategy):
+    def __init__(self, percentage: float):
+        self.__percentage: float = percentage
+
+    def apply(self, total: float) -> float:
+        return total - (total * self.__percentage / 100)
+
+# Discount Strategy that Takes an Amount Off Totals Over a Threshold
+class BulkDiscount(DiscountStrategy):
+    def __init__(self, threshold: float, amount: float):
+        self.__threshold: float = threshold
+        self.__amount: float = amount
+
+    def apply(self, total: float) -> float:
+        if total >= self.__threshold:
+            return total - self.__amount
+        return total
+
 # OrderLine Class (Refers to a Product, Does Not Own It)
 class OrderLine:
     def __init__(self, product: Product, quantity: int):
@@ -189,9 +219,18 @@ class OrderLine:
 
 # Order Class (Creates and Owns Its OrderLines)
 class Order:
-    def __init__(self, order_id: str):
+    def __init__(self, order_id: str, discount: DiscountStrategy | None = None):
         self.__order_id: str = order_id
         self.__order_lines: list[OrderLine] = []
+
+        # Use No Discount if None Is Given
+        if discount is None:
+            discount = NoDiscount()
+        self.__discount: DiscountStrategy = discount
+
+    # Strategy Can Be Swapped Later
+    def set_discount(self, discount: DiscountStrategy) -> None:
+        self.__discount = discount
 
     # OrderLine Is Created Inside the Order, Never Passed In
     def add_order_line(self, product: Product, quantity: int) -> None:
@@ -208,12 +247,12 @@ class Order:
                 return True
         return False
 
-    # Each OrderLine Calculates Its Own Subtotal
+    # Each OrderLine Calculates Its Own Subtotal, Then the Strategy Applies the Discount
     def calculate_total(self) -> float:
         total = 0.0
         for line in self.__order_lines:
             total += line.calculate_subtotal()
-        return total
+        return self.__discount.apply(total)
 
     def display_order(self) -> None:
         print(f"Order ID: {self.__order_id}")
