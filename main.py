@@ -202,6 +202,11 @@ class BulkDiscount(DiscountStrategy):
             return total - self.__amount
         return total
 
+# Discount Strategy for Students (5% Off)
+class StudentDiscount(DiscountStrategy):
+    def apply(self, total: float) -> float:
+        return total - (total * 5 / 100)
+
 # OrderLine Class (Refers to a Product, Does Not Own It)
 class OrderLine:
     def __init__(self, product: Product, quantity: int):
