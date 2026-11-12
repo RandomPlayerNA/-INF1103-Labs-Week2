@@ -3,7 +3,7 @@
         "id": "P001",
         "name": "Laptop",
         "price": 1200.0,
-        "stock": 15,
+        "stock": 12,
         "supplier": {
             "id": "S001",
             "name": "TechWorld Supplies",
@@ -89,5 +89,31 @@
         },
         "type": "physical",
         "weight": 0.2
+    },
+    {
+        "id": "P008",
+        "name": "Standing Desk",
+        "price": 349.99,
+        "stock": 8,
+        "supplier": {
+            "id": "S001",
+            "name": "TechWorld Supplies",
+            "email": "sales@techworld.example.com"
+        },
+        "type": "physical",
+        "weight": 18.5
+    },
+    {
+        "id": "P009",
+        "name": "Video Editor Pro",
+        "price": 129.99,
+        "stock": 50,
+        "supplier": {
+            "id": "S003",
+            "name": "CreativeApps Co",
+            "email": "support@creativeapps.example.com"
+        },
+        "type": "digital",
+        "download_size": 2500.0
     }
 ]

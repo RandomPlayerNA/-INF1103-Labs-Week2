@@ -1,8 +1,8 @@
-// Inventory Management System - UML Class Diagram (Lab 9)
+// Lab 9 UML Diagram
 // Render: dot -Tpng -Gdpi=150 "lab 9.dot" -o "lab 9.png"
 
 digraph UML {
-    graph [label="Inventory Management System - UML Class Diagram (Lab 9)", labelloc=t,
+    graph [label="Lab 9 UML Diagram", labelloc=t,
            fontname="DejaVu Sans", fontsize=18, nodesep=0.7, ranksep=1.0, pad=0.4, bgcolor="white"]
     node  [shape=plaintext, fontname="DejaVu Sans", fontsize=11]
     edge  [fontname="DejaVu Sans", fontsize=10, labelfontname="DejaVu Sans", labelfontsize=11,
@@ -110,18 +110,6 @@ digraph UML {
       <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ apply(total: Float): Float</TD></TR>
     </TABLE>>]
 
-    Legend [label=<
-    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5">
-      <TR><TD COLSPAN="2" BGCOLOR="#eeeeee"><B>Key</B></TD></TR>
-      <TR><TD ALIGN="LEFT">- / +</TD><TD ALIGN="LEFT">private / public</TD></TR>
-      <TR><TD ALIGN="LEFT"><I>Italic</I></TD><TD ALIGN="LEFT">abstract</TD></TR>
-      <TR><TD ALIGN="LEFT"><U>Underline</U></TD><TD ALIGN="LEFT">static (called on the class, not an object)</TD></TR>
-      <TR><TD ALIGN="LEFT">Type [0..*]</TD><TD ALIGN="LEFT">collection (Python list[Type])</TD></TR>
-      <TR><TD ALIGN="LEFT">Type [0..1]</TD><TD ALIGN="LEFT">optional (Python Type | None)</TD></TR>
-      <TR><TD ALIGN="LEFT">void</TD><TD ALIGN="LEFT">no return value (Python None)</TD></TR>
-      <TR><TD ALIGN="LEFT">- - - &gt; &laquo;creates&raquo;</TD><TD ALIGN="LEFT">dependency (uses, does not store)</TD></TR>
-    </TABLE>>]
-
     // ------ //
     // Layout
     // ------ //
@@ -133,7 +121,6 @@ digraph UML {
     CanBeShipped -> Product [style=invis]
     OrderLine -> DiscountStrategy [style=invis]
     PhysicalProduct -> DigitalProduct -> NoDiscount -> PercentageDiscount -> BulkDiscount -> StudentDiscount [style=invis]
-    StudentDiscount -> Legend [style=invis]
 
     // ------------- //
     // Relationships
