@@ -44,6 +44,13 @@ class CanBeShipped(ABC):
 # Abstract Product Class
 class Product(ABC):
     def __init__(self, productid: str, name: str, price: float, stock: int, supplier: Supplier):
+        
+        # Product Protects Its Own Rules
+        if price <= 0:
+            raise ValueError("Price must be greater than zero.")
+        if stock < 0:
+            raise ValueError("Stock cannot be negative.")
+
         self.__id: str = productid
         self.__name: str = name
         self.__price: float = price
@@ -93,8 +100,7 @@ class Product(ABC):
 
 # Product Sub-Class with New Attribute, Weight
 class PhysicalProduct(Product, CanBeShipped):
-    def __init__(self, productid: str, name: str, price: float, stock: int,
-                 weight: float, supplier: Supplier):
+    def __init__(self, productid: str, name: str, price: float, stock: int, weight: float, supplier: Supplier):
         super().__init__(productid, name, price, stock, supplier)
         self.__weight: float = weight
 
@@ -117,8 +123,7 @@ class PhysicalProduct(Product, CanBeShipped):
 
 # Product Sub-Class with New Attribute, Download Size
 class DigitalProduct(Product):
-    def __init__(self, productid: str, name: str, price: float, stock: int,
-                 download_size: float, supplier: Supplier):
+    def __init__(self, productid: str, name: str, price: float, stock: int, download_size: float, supplier: Supplier):
         super().__init__(productid, name, price, stock, supplier)
         self.__download_size: float = download_size
 
@@ -137,10 +142,10 @@ class DigitalProduct(Product):
 
 # Product Factory Class (The Only Place that Creates Products)
 class ProductFactory:
+    
     # Weight Is Only Used by Physical, Download Size Only by Digital
     @staticmethod
-    def create(product_type: str, product_id: str, name: str, price: float, stock: int,
-               supplier: Supplier, weight: float = 0.0, download_size: float = 0.0) -> Product:
+    def create(product_type: str, product_id: str, name: str, price: float, stock: int, supplier: Supplier, weight: float = 0.0, download_size: float = 0.0) -> Product:
         if product_type == "physical":
             return PhysicalProduct(product_id, name, price, stock, weight, supplier)
         elif product_type == "digital":
@@ -223,6 +228,11 @@ class StudentDiscount(DiscountStrategy):
 # OrderLine Class (Refers to a Product, Does Not Own It)
 class OrderLine:
     def __init__(self, product: Product, quantity: int):
+        
+        # OrderLine Protects Its Own Quantity
+        if quantity <= 0:
+            raise ValueError("Quantity must be greater than zero.")
+
         self.__product: Product = product
         self.__quantity: int = quantity
 
@@ -311,11 +321,11 @@ def get_valid_price_input(prompt: str) -> float:
     while True:
         try:
             price = float(input(prompt).strip())
-            if price >= 0:
+            if price > 0:
                 return price
         except ValueError:
             pass
-        print("Invalid input! Please enter a non-negative number.")
+        print("Invalid input! Please enter a number greater than zero.")
 
 # ------------------- #
 # Inventory Functions
