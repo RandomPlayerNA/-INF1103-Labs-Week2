@@ -2,6 +2,7 @@
 # Imports
 # ------- #
 
+import csv
 import json
 import os
 from abc import ABC, abstractmethod
@@ -316,16 +317,21 @@ def get_valid_stock_input(prompt: str) -> int:
 
     return int(stock)
 
-# Function to Get Valid Price from User
-def get_valid_price_input(prompt: str) -> float:
+# Function to Get a Positive Number from User
+def get_positive_float(prompt: str) -> float:
     while True:
         try:
-            price = float(input(prompt).strip())
-            if price > 0:
-                return price
+            value = float(input(prompt).strip())
+
+            # Validation: Must Be Above Zero
+            if value <= 0:
+                print("Please enter a number greater than zero.")
+                continue
+            return value
+
+        # Exception: Text that Is Not a Number
         except ValueError:
-            pass
-        print("Invalid input! Please enter a number greater than zero.")
+            print("Please enter a valid number, e.g. 12.50")
 
 # ------------------- #
 # Inventory Functions
@@ -348,7 +354,7 @@ def add_product(inventory: Inventory) -> None:
         product_type = get_text_input("Product Type (P = Physical, D = Digital): ").upper()
 
     name = get_text_input("Product Name: ")
-    price = get_valid_price_input("Price: ")
+    price = get_positive_float("Price: ")
     stock = get_valid_stock_input("Stock Quantity: ")
 
     # Ask for the Attribute Specific to the Chosen Product Type
@@ -356,10 +362,10 @@ def add_product(inventory: Inventory) -> None:
     download_size = 0.0
     if product_type == "P":
         product_type = "physical"
-        weight = get_valid_price_input("Weight (kg): ")
+        weight = get_positive_float("Weight (kg): ")
     else:
         product_type = "digital"
-        download_size = get_valid_price_input("Download Size (MB): ")
+        download_size = get_positive_float("Download Size (MB): ")
 
     # Create the Supplier First, Then Pass It to the Product
     supplier_id = get_text_input("Supplier ID: ").upper()
@@ -520,6 +526,33 @@ def load_inventory() -> Inventory:
 def save_inventory(inventory: Inventory) -> None:
     with open(FILENAME, "w") as file:
         json.dump(inventory.to_list(), file, indent=4)
+
+# Function to Load Products from a CSV File (Bad Rows Are Skipped)
+def load_products(path: str, inventory: Inventory, supplier: Supplier) -> None:
+    try:
+        file = open(path, newline="")
+    except FileNotFoundError:
+        print(f"Products file not found: {path}")
+    else:
+        with file:
+            reader = csv.reader(file)
+            next(reader)  # Skip the Header Row
+            loaded = 0
+
+            # Each Row Has Its Own try, So One Bad Row Does Not Stop the Rest
+            for row in reader:
+                try:
+                    product_type, product_id, name, price, stock = row
+                    product = ProductFactory.create(product_type, product_id, name,
+                                                    float(price), int(stock), supplier)
+                    inventory.add_product(product)
+                    loaded += 1
+                except ValueError as error:
+                    print(f"Skipped row {row}: {error}")
+
+        print(f"{loaded} products loaded.")
+    finally:
+        print("Load attempt finished.")
 
 # ---- #
 # Menu
