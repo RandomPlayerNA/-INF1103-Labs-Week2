@@ -135,6 +135,19 @@ class DigitalProduct(Product):
     def get_fulfillment_info(self) -> str:
         return "Product is delivered digitally."
 
+# Product Factory Class (The Only Place that Creates Products)
+class ProductFactory:
+    # Weight Is Only Used by Physical, Download Size Only by Digital
+    @staticmethod
+    def create(product_type: str, product_id: str, name: str, price: float, stock: int,
+               supplier: Supplier, weight: float = 0.0, download_size: float = 0.0) -> Product:
+        if product_type == "physical":
+            return PhysicalProduct(product_id, name, price, stock, weight, supplier)
+        elif product_type == "digital":
+            return DigitalProduct(product_id, name, price, stock, download_size, supplier)
+        else:
+            raise ValueError(f"Unknown product type: {product_type}")
+
 # Inventory Class
 class Inventory:
     def __init__(self):
@@ -329,9 +342,13 @@ def add_product(inventory: Inventory) -> None:
     stock = get_valid_stock_input("Stock Quantity: ")
 
     # Ask for the Attribute Specific to the Chosen Product Type
+    weight = 0.0
+    download_size = 0.0
     if product_type == "P":
+        product_type = "physical"
         weight = get_valid_price_input("Weight (kg): ")
     else:
+        product_type = "digital"
         download_size = get_valid_price_input("Download Size (MB): ")
 
     # Create the Supplier First, Then Pass It to the Product
@@ -340,10 +357,9 @@ def add_product(inventory: Inventory) -> None:
     supplier_email = get_text_input("Supplier Email: ")
     supplier = Supplier(supplier_id, supplier_name, supplier_email)
 
-    if product_type == "P":
-        inventory.add_product(PhysicalProduct(product_id, name, price, stock, weight, supplier))
-    else:
-        inventory.add_product(DigitalProduct(product_id, name, price, stock, download_size, supplier))
+    # Factory Decides Which Product Class to Create
+    product = ProductFactory.create(product_type, product_id, name, price, stock, supplier, weight, download_size)
+    inventory.add_product(product)
     print("\nProduct added successfully!")
 
 # Function to Update the Stock of an Existing Product
@@ -461,7 +477,7 @@ def load_inventory() -> Inventory:
     # Suppliers Already Created, Stored by Supplier ID
     suppliers: dict[str, Supplier] = {}
 
-    # Convert Each Product Dictionary into the Matching Product Sub-Class Using Its Type
+    # Convert Each Product Dictionary into a Product Using the Factory
     for item in data:
         supplier_data = item["supplier"]
 
@@ -470,10 +486,22 @@ def load_inventory() -> Inventory:
             suppliers[supplier_data["id"]] = Supplier(supplier_data["id"], supplier_data["name"], supplier_data["email"])
         supplier = suppliers[supplier_data["id"]]
 
-        if item["type"] == "physical":
-            inventory.add_product(PhysicalProduct(item["id"], item["name"], item["price"], item["stock"], item["weight"], supplier))
-        elif item["type"] == "digital":
-            inventory.add_product(DigitalProduct(item["id"], item["name"], item["price"], item["stock"], item["download_size"], supplier))
+        # Unknown Types Are Skipped Instead of Crashing the Program
+        try:
+            product = ProductFactory.create(
+                item["type"], 
+                item["id"], 
+                item["name"], 
+                item["price"],
+                item["stock"], 
+                supplier, 
+                item.get("weight", 0.0),
+                item.get("download_size", 0.0)
+            )
+            
+            inventory.add_product(product)
+        except ValueError as error:
+            print(f"Skipped {item['id']}: {error}")
 
     print("Inventory loaded successfully.\n")
     return inventory
