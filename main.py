@@ -495,15 +495,15 @@ def load_inventory() -> Inventory:
 
     # Convert Each Product Dictionary into a Product Using the Factory
     for item in data:
-        supplier_data = item["supplier"]
-
-        # Reuse the Same Supplier Object for Products with the Same Supplier
-        if supplier_data["id"] not in suppliers:
-            suppliers[supplier_data["id"]] = Supplier(supplier_data["id"], supplier_data["name"], supplier_data["email"])
-        supplier = suppliers[supplier_data["id"]]
-
-        # Unknown Types Are Skipped Instead of Crashing the Program
+        # Bad or Missing Data Is Skipped Instead of Crashing the Program
         try:
+            supplier_data = item["supplier"]
+
+            # Reuse the Same Supplier Object for Products with the Same Supplier
+            if supplier_data["id"] not in suppliers:
+                suppliers[supplier_data["id"]] = Supplier(supplier_data["id"], supplier_data["name"], supplier_data["email"])
+            supplier = suppliers[supplier_data["id"]]
+
             product = ProductFactory.create(
                 item["type"], 
                 item["id"], 
@@ -517,7 +517,9 @@ def load_inventory() -> Inventory:
             
             inventory.add_product(product)
         except ValueError as error:
-            print(f"Skipped {item['id']}: {error}")
+            print(f"Skipped {item.get('id', 'unknown')}: {error}")
+        except KeyError as error:
+            print(f"Skipped {item.get('id', 'unknown')}: missing {error}")
 
     print("Inventory loaded successfully.\n")
     return inventory
